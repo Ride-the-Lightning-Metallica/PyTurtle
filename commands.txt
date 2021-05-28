@@ -1,0 +1,19 @@
+Commands for moving the cursor:
+FORWARD(n) - forward n pixels;
+BACKWARD(n) - backward n pixels;
+LEFT(n) - to the left by n degrees;
+RIGHT(n) - to the right by n degrees;
+CIRCLE(r) - draw a circle of radius r, centered to the left of the cursor, if r> 0, to the right, if r <0;
+DEGREE_CIRCLE(r, n) - draw an arc of radius r, in degree n counterclockwise, if r> 0, clockwise, if r <0;
+GOTO(x,y) - move cursor to point with coordinates (x, y);
+
+Drawing commands:
+DOWN() - lower cursor to draw;
+UP() - raise cursor;
+WIDTH(n) - width of the cursor trace in n pixels;
+СOLOR(s) - cursor drawing color example: "red", "blue";
+BEGIN_FILL(), END_FILL() - draws filled areas (beginning and end of drawing);
+
+Additionally:
+RESET() - clears the screen, returns the cursor;
+CLEAR() - clear screen;
