@@ -3,9 +3,7 @@ After clicking the "Run" button checks for errors, if there are none launches a 
 with drawing "turtle graphics". If errors are present, it displays a message indicating
 the line, in which the error occurred.'''
 import turtle
-import tkinter
 from turtle_gui import TurtleEditor
-from functools import partial
 
 help_text = '''
 Control the turtle by entering commands from the commands file on
@@ -23,7 +21,7 @@ commands = {
 	'DOWN': 'turtle.down($ARGUMENTS$)',
 	'UP': 'turtle.up($ARGUMENTS$)',
 	'WIDTH': 'turtle.width($ARGUMENTS$)',
-	'СOLOR': 'turtle.сolor($ARGUMENTS$)',
+	'COLOR': 'turtle.color($ARGUMENTS$)',
 	'BEGIN_FILL': 'turtle.begin_fill($ARGUMENTS$)',
 	'END_FILL': 'turtle.end_fill($ARGUMENTS$)',
 	'RESET': 'turtle.reset($ARGUMENTS$)',
@@ -45,26 +43,27 @@ class PyTurtle(TurtleEditor):
 				continue
 
 			if not line.endswith(';'):
-				print(f'There is no ";" at the end of the line. Line: {number_of_line}')
+				self.show_error(f'There is no ";" at the end of the line. Line: {number_of_line}')
 				return False
 
 			if ';' in line[:-1]:
-				print('The symbol ";" must occur once and be at the end of the line.', 
-					  f'Line: {number_of_line}')
+				self.show_error('The symbol ";" must occur once and be at the end of the line.', 
+								f'Line: {number_of_line}')
 				return False
 
 			if open_parenthesis == -1 or closing_parenthesis == -1:
-				print(f'The line is missing parentheses. Line: {number_of_line}')
+				self.show_error(f'The line is missing parentheses. Line: {number_of_line}')
 				return False
 			
 			if line[:open_parenthesis].upper() not in commands:
-				print(f'The line contains an unknown command. Line: {number_of_line}')
+				self.show_error(f'The line contains an unknown command. Line: {number_of_line}')
 				return False
 		return True
 
 	def run_code(self, code):
 		turtle.TurtleScreen._RUNNING = True
-		for line in code:
+		turtle.shape('turtle')
+		for number_of_line, line in enumerate(code, start=1):
 			if line.strip() == '':
 				continue
 
@@ -74,8 +73,10 @@ class PyTurtle(TurtleEditor):
 			command = commands[line[:open_parenthesis].upper()]
 			command_arguments = line[open_parenthesis+1:closing_parenthesis]
 			
-			exec(command.replace('$ARGUMENTS$', command_arguments))
-		
+			try:
+				exec(command.replace('$ARGUMENTS$', command_arguments))
+			except TypeError as error:
+				self.show_error(str(error) + f'. Line: {number_of_line}')
 
 if __name__ == '__main__':
 	root = PyTurtle('500x500', 'PyTurtle', resizable_width=False, resizable_height=False,

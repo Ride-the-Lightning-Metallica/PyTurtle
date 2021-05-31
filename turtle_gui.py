@@ -52,4 +52,7 @@ class TurtleEditor(tkinter.Tk):
 	def run(self):
 		print('Override this method in a subclass')
 
+	def show_error(self, error_message):
+		tkinter.messagebox.showerror('PyTurtle: Error', error_message)
+
 
