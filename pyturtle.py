@@ -9,6 +9,7 @@ help_text = '''
 Control the turtle by entering commands from the commands file on
 each separate line and end the line with a semicolon:
 '''
+filetypes = [('Текстовый файл', '*.txt')]
 
 commands = {
 	'FORWARD': 'turtle.forward($ARGUMENTS$)',
@@ -30,12 +31,12 @@ commands = {
 
 class PyTurtle(TurtleEditor):
 	def run(self):
-		code = self.textarea.get('1.0', 'end').splitlines()
-		if self.validate_code(code):
-			self.run_code(code)
+		self.code = self.textarea.get('1.0', 'end').splitlines()
+		if self.validate_code():
+			self.run_code()
 
-	def validate_code(self, code):
-		for number_of_line, line in enumerate(code, start=1):
+	def validate_code(self):
+		for number_of_line, line in enumerate(self.code, start=1):
 			open_parenthesis = line.find('(')
 			closing_parenthesis = line.find(')')
 
@@ -60,10 +61,10 @@ class PyTurtle(TurtleEditor):
 				return False
 		return True
 
-	def run_code(self, code):
+	def run_code(self):
 		turtle.TurtleScreen._RUNNING = True
 		turtle.shape('turtle')
-		for number_of_line, line in enumerate(code, start=1):
+		for number_of_line, line in enumerate(self.code, start=1):
 			if line.strip() == '':
 				continue
 
@@ -76,9 +77,25 @@ class PyTurtle(TurtleEditor):
 			try:
 				exec(command.replace('$ARGUMENTS$', command_arguments))
 			except TypeError as error:
-				self.show_error(str(error) + f'. Line: {number_of_line}')
+				self.show_error(str(error).title() + f'. Line: {number_of_line}')
+
+	def save(self):
+		code = self.textarea.get('1.0', 'end').splitlines()
+		filename = self.get_file_for_save()
+		with open(filename, 'w') as file:
+			for line in code:
+				file.write(line + '\n')
+	
+	def open_file(self):
+		file = self.get_file_for_read()
+		try:
+			for line in file:
+				self.textarea.insert('1.0', line)
+		finally:
+			file.close()
 
 if __name__ == '__main__':
 	root = PyTurtle('500x500', 'PyTurtle', resizable_width=False, resizable_height=False,
-					help_text=help_text)
+					help_text=help_text, filetypes=filetypes)
 	root.mainloop()
+
